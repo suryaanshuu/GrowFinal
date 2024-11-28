@@ -1,0 +1,84 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model customer {
+  cid   Int     @id
+  name  String? @db.VarChar(75)
+  phone Int?
+  email String? @db.VarChar(75)
+  age   Int?
+}
+
+model nurseplant {
+  name     String  @db.VarChar(75)
+  batch_no Int
+  loc      String? @db.VarChar(25)
+  stock    Int?
+  plant    plant   @relation(fields: [name], references: [name], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([name, batch_no])
+}
+
+model plant {
+  name        String       @id @db.VarChar(75)
+  water       String?      @db.VarChar(10)
+  sunlight    String?      @db.VarChar(10)
+  lifespan    Int?
+  height      Float?       @db.Real
+  fruit_nut   String?      @db.Char(1)
+  soil_ph     Float?       @db.Real
+  temperature Float?       @db.Real
+  fertilizer  String?      @db.VarChar(25)
+  pest        String?      @db.VarChar(75)
+  comp_plants String?      @db.VarChar(75)
+  nurseplant  nurseplant[]
+  pricing     pricing[]
+  seed        seed[]
+}
+
+model pricing {
+  id         Int    @id @default(autoincrement())
+  pl_name    String @db.VarChar(75) @unique
+  unit_price Float? @db.Real
+  plant      plant  @relation(fields: [pl_name], references: [name], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model seed {
+  pl_name         String                   @db.VarChar(75)
+  sid             Int
+  quantity        Int?
+  price           Float?                   @db.Real
+  germination     Unsupported("interval")?
+  temp            Float?                   @db.Real
+  humidity        String?                  @db.VarChar(10)
+  prop_time       Unsupported("interval")?
+  expiration_date DateTime?                @db.Date
+  plant           plant                    @relation(fields: [pl_name], references: [name], onDelete: NoAction, onUpdate: NoAction)
+  supplier        supplier                 @relation(fields: [sid], references: [sid], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([sid, pl_name])
+}
+
+model supplier {
+  sid       Int                      @id
+  name      String?                  @db.VarChar(75)
+  phone     Int?
+  email     String?                  @db.VarChar(75)
+  address   String?                  @db.VarChar(150)
+  lead_time Unsupported("interval")?
+  seed      seed[]
+}
+
+model adminuser {
+  id             Int     @id @default(autoincrement())
+  username       String?
+  email          String?
+  hashedpassword String?
+}
