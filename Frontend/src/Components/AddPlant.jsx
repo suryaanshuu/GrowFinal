@@ -1,8 +1,4 @@
 import React, { useState } from 'react';
-import { 
-  Container, Box, Typography, TextField, Button, 
-  FormControl, InputLabel, Select, MenuItem, Snackbar
-} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -46,159 +42,49 @@ const AddPlant = () => {
   };
 
   return (
-    <Container component="main" maxWidth="sm">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Typography component="h1" variant="h4" sx={{ mb: 4 }}>
-          Add New Plant
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="name"
-            label="Plant Name"
-            name="name"
-            autoFocus
-            value={plantData.name}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="water"
-            label="Water Needs"
-            name="water"
-            value={plantData.water}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="sunlight"
-            label="Sunlight Needs"
-            name="sunlight"
-            value={plantData.sunlight}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="lifespan"
-            label="Lifespan (years)"
-            name="lifespan"
-            type="number"
-            value={plantData.lifespan}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="height"
-            label="Height (meters)"
-            name="height"
-            type="number"
-            step="0.01"
-            value={plantData.height}
-            onChange={handleChange}
-          />
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel id="fruit-nut-label">Fruit/Nut Bearing</InputLabel>
-            <Select
-              labelId="fruit-nut-label"
-              id="fruit_nut"
-              name="fruit_nut"
-              value={plantData.fruit_nut}
-              label="Fruit/Nut Bearing"
-              onChange={handleChange}
-            >
-              <MenuItem value="Y">Yes</MenuItem>
-              <MenuItem value="N">No</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="soil _ph"
-            label="Soil pH"
-            name="soil_ph"
-            type="number"
-            step="0.01"
-            value={plantData.soil_ph}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="temperature"
-            label="Temperature (°C)"
-            name="temperature"
-            type="number"
-            step="0.01"
-            value={plantData.temperature}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="fertilizer"
-            label="Fertilizer Needs"
-            name="fertilizer"
-            value={plantData.fertilizer}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="pest"
-            label="Pest Susceptibility"
-            name="pest"
-            value={plantData.pest}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="comp_plants"
-            label="Companion Plants"
-            name="comp_plants"
-            value={plantData.comp_plants}
-            onChange={handleChange}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Add Plant
-          </Button>
-        </Box>
-        <Snackbar
-          open={snackbar.open}
-          message={snackbar.message}
-          onClose={() => setSnackbar({ open: false, message: '' })}
-          autoHideDuration={2000}
-        />
-      </Box>
-    </Container>
+    <div className="min-h-screen bg-green-50 flex flex-col items-center py-12 px-4">
+      <h1 className="text-4xl font-semibold text-green-600 mb-8">Add New Plant</h1>
+      <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white p-8 rounded-lg shadow-lg">
+        {Object.keys(plantData).map((key) => (
+          <div key={key} className="mb-4">
+            <label htmlFor={key} className="block text-sm font-medium text-gray-700 capitalize">
+              {key.replace('_', ' ')}
+            </label>
+            {key === 'fruit_nut' || key === 'soil_ph' || key === 'temperature' ? (
+              <input
+                type="number"
+                id={key}
+                name={key}
+                value={plantData[key]}
+                onChange={handleChange}
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                step="0.01"
+              />
+            ) : (
+              <input
+                type="text"
+                id={key}
+                name={key}
+                value={plantData[key]}
+                onChange={handleChange}
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            )}
+          </div>
+        ))}
+        <button
+          type="submit"
+          className="w-full py-2 px-4 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          Add Plant
+        </button>
+      </form>
+      {snackbar.open && (
+        <div className="mt-4 text-center text-green-600">
+          {snackbar.message}
+        </div>
+      )}
+    </div>
   );
 };
 

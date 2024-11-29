@@ -12,6 +12,7 @@ import {
   Link,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import MarketingBox from './MarketingBox';
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,30 +20,31 @@ const AuthForm = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!username || !password || (!isLogin && !email)) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+
+    setLoading(true);
     try {
       if (isLogin) {
-        console.log('Attempting login...');
         const response = await axios.post('http://localhost:5000/api/login', { username, password });
-        console.log('Login successful', response.data);
         localStorage.setItem('token', response.data.token);
-        console.log('Token stored in localStorage');
         navigate('/admin');
-        console.log('Navigation to /admin attempted');
       } else {
-        console.log('Attempting signup...');
         const response = await axios.post('http://localhost:5000/api/signup', { username, email, password });
-        console.log('Signup successful', response.data);
-        // You might want to automatically log in the user after signup
-        // or navigate them to a different page
-        setIsLogin(true);
+        localStorage.setItem('token', response.data.token); // Auto-login after signup
+        navigate('/admin');
       }
     } catch (err) {
-      console.error(isLogin ? 'Login error:' : 'ASignup error:', err);
-      setError(isLogin ? 'Invalid username or password' : 'Signup failed');
+      setError(err.response?.data?.message || (isLogin ? 'Invalid username or password' : 'Signup failed'));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,81 +54,100 @@ const AuthForm = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          {isLogin ? 'Sign in' : 'Sign up'}
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="username"
-            label="Username"
-            name="username"
-            autoComplete="username"
-            autoFocus
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          {!isLogin && (
+    <Container component="main" maxWidth="lg">
+      {/* Flexbox container for MarketingBox and login form */}
+      <div className="flex justify-between items-center space-x-4">
+        {/* MarketingBox on the right */}
+        <div className="flex-1 hidden lg:block">
+          <MarketingBox />
+        </div>
+
+        {/* Login Box */}
+        <Box
+          sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+          className="bg-white rounded-lg shadow-xl p-8 w-full lg:w-1/3"
+        >
+          <Avatar sx={{ m: 1, bgcolor: 'green.500' }} className="bg-green-500">
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5" className="text-center text-green-600 font-extrabold mb-4">
+            {isLogin ? 'Sign In' : 'Sign Up'}
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }} className="space-y-4">
             <TextField
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
+              autoFocus
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="border-2 border-green-300 focus:ring-green-500 focus:border-green-500"
             />
-          )}
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {error && (
-            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              {error}
-            </Typography>
-          )}
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            {isLogin ? 'Sign In' : 'Sign Up'}
-          </Button>
-          <Grid container justifyContent="flex -end">
-            <Grid item>
-              <Link variant="body2" onClick={toggleMode}>
-                {isLogin ? 'Don\'t have an account? Sign Up' : 'Already have an account? Sign In'}
-              </Link>
+            {!isLogin && (
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="border-2 border-green-300 focus:ring-green-500 focus:border-green-500"
+              />
+            )}
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="border-2 border-green-300 focus:ring-green-500 focus:border-green-500"
+            />
+            {error && (
+              <Typography color="error" variant="body2" sx={{ mt: 1 }} className="text-red-500 text-center">
+                {error}
+              </Typography>
+            )}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={loading}
+              sx={{ mt: 3, mb: 2 }}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold transition-all duration-200"
+            >
+              {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Sign Up'}
+            </Button>
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <Link
+                  variant="body2"
+                  onClick={toggleMode}
+                  className="text-green-600 hover:text-green-700 cursor-pointer transition-all duration-200"
+                >
+                  {isLogin ? "Don't have an account? Sign Up" : 'Already have an account? Sign In'}
+                </Link>
+              </Grid>
             </Grid>
-          </Grid>
+          </Box>
         </Box>
-      </Box>
+      </div>
     </Container>
   );
 };

@@ -18,11 +18,11 @@ const Footer = () => {
 
           <ul className='text-gray'>
             <li className='text-gray-1000 hover:text-green-600'>
-              <a href='#'>About Us</a>
+              <a href='/QRCodeGenerator'>QR Generator</a>
             </li>
 
             <li className='text-gray-1000 hover:text-green-600'>
-              <a href='#'>Contact Us</a>
+              <a href='/Admin'>Admin Dashboard</a>
             </li>
 
             <li className='text-gray-1000 hover:text-green-600'>
