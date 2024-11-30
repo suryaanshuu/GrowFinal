@@ -18,4 +18,9 @@ export default defineConfig({
       '/api': 'http://localhost:5000',
     },
   },
+  base: './', // Use relative paths
+  build: {
+    outDir: 'dist', // Ensure output directory is 'dist'
+    assetsDir: 'assets', // Ensure assets are in the 'assets' folder
+  },
 });
